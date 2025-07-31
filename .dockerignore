@@ -1,4 +1,35 @@
-Dockerfile
-
-# Ignore .git folder
+# Git
 .git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# Virtual Environment
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs and databases
+*.log
+*.sqlite
+
+# Environment variables
+.env
+
+# Local development files
+.devspace/

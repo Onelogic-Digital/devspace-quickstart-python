@@ -1,18 +1,44 @@
-FROM python:3.8-slim-buster
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim-buster as builder
 
-# Create project directory (workdir)
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set work directory
 WORKDIR /app
 
-# Add requirements.txt to WORKDIR and install dependencies
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip install --user -r requirements.txt
 
-# Add source code files to WORKDIR
-ADD . .
+# Final stage
+FROM python:3.8-slim-buster
 
-# Application port (optional)
+# Set work directory
+WORKDIR /app
+
+# Copy only necessary files from builder
+COPY --from=builder /root/.local /root/.local
+COPY --from=builder /app/requirements.txt .
+
+# Copy application code
+COPY . .
+
+# Make sure scripts in .local are usable
+ENV PATH=/root/.local/bin:$PATH
+
+# Make port 8080 available to the world outside this container
 EXPOSE 8080
 
-# Container start command
-# It is also possible to override this in devspace.yaml via images.*.cmd
+# Define environment variable
+ENV FLASK_APP=main.py
+ENV FLASK_ENV=production
+
+# Run the application
 CMD ["python", "main.py"]
