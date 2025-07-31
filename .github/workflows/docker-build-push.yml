@@ -8,6 +8,7 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    # Allow manual triggering of the workflow
 
 # This job uses the GitHub-script "simple prompt" that is reusable, fast, and has no depedencies.
 # See: https://github.com/actions/github-script
@@ -45,10 +46,15 @@ jobs:
             type=semver,pattern={{version}}
             type=sha,format=long
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          labels: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

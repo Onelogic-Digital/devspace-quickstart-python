@@ -1,24 +1,26 @@
-# Use an official Python runtime as a parent image
-FROM python:3.8-slim-buster as builder
+# Use an official Python runtime as a parent image with bookworm for better stability
+FROM python:3.11-slim-bookworm as builder
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive
 
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies with retry logic
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --user -r requirements.txt
 
 # Final stage
-FROM python:3.8-slim-buster
+FROM python:3.11-slim-bookworm
 
 # Set work directory
 WORKDIR /app
