@@ -7,6 +7,7 @@ on:
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 # This job uses the GitHub-script "simple prompt" that is reusable, fast, and has no depedencies.
 # See: https://github.com/actions/github-script
