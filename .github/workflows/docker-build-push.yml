@@ -23,7 +23,8 @@ permissions:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest  # Using GitHub-hosted runner
+    # runs-on: ubuntu-latest  # Using GitHub-hosted runner
+    runs-on: [self-hosted, ck-github-actions]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
